@@ -2,50 +2,40 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR Puppy Click To Start</title>
+    <title>AR Cube Test</title>
     <script>
-        // 抓虫神器升级版：逼手机交出真实报错！
         window.onerror = function(msg, url, line) {
-            alert("真实报错: " + msg + "\n行数: " + line);
+            alert("诊断报错: " + msg + "\n行数: " + line);
         };
     </script>
     <script crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script crossorigin="anonymous" src="https://fastly.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/MTLLoader.js"></script>
-    <script crossorigin="anonymous" src="https://fastly.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
     <script crossorigin="anonymous" src="https://fastly.jsdelivr.net/gh/AR-js-org/AR.js@3.3.2/three.js/build/ar.js"></script>
 </head>
 <body style="margin: 0px; overflow: hidden; background-color: #333333;">
     
     <div id="start-screen" style="position:absolute; top:0; left:0; width:100%; height:100%; background:#222; z-index:9999; display:flex; justify-content:center; align-items:center; flex-direction:column;">
         <p style="color:white; font-size:18px; text-align:center; padding:20px;">
-            请确认已将 tex.jpg 传至 GitHub！<br><br>
-            为突破苹果的安全拦截，请手动点击下方按钮
+            【诊断测试：控制变量】<br>我们先不加载小狗，只测试摄像头！
         </p>
-        <button onclick="startAR()" style="padding: 15px 30px; font-size: 20px; background-color: #4CAF50; color: white; border: none; border-radius: 8px;">允许开启摄像头并加载小狗</button>
+        <button onclick="startAR()" style="padding: 15px 30px; font-size: 20px; background-color: #008CBA; color: white; border: none; border-radius: 8px;">启动摄像头测试</button>
     </div>
 
     <script>
         var scene, camera, renderer, clock, deltaTime, totalTime;
-        var arToolkitSource, arToolkitContext, markerRoot1, mesh0;
+        var arToolkitSource, arToolkitContext, markerRoot1;
 
         function startAR() {
-            // 隐藏启动按钮
             document.getElementById('start-screen').style.display = 'none';
-
             if (typeof THREEx === 'undefined') {
-                alert("⚠️ 核心库还是没下载下来！请关掉手机 Wi-Fi，用 5G/4G 流量刷新网页！");
+                alert("核心库未加载，请切换网络！");
                 return;
             }
-
             initialize();
             animate();
         }
 
         function initialize() {
             scene = new THREE.Scene();
-            let ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
-            scene.add(ambientLight);
-
             camera = new THREE.Camera();
             scene.add(camera);
 
@@ -58,8 +48,6 @@
             document.body.appendChild(renderer.domElement);
 
             clock = new THREE.Clock();
-            deltaTime = 0;
-            totalTime = 0;
 
             arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
             arToolkitSource.init(function onReady(){ 
@@ -89,28 +77,17 @@
                 patternUrl: 'https://fastly.jsdelivr.net/gh/AR-js-org/AR.js@3.3.2/data/data/patt.hiro',
             });
 
-            new THREE.MTLLoader()
-                .setPath('./')
-                .load('puppy.mtl', function (materials) {
-                    materials.preload();
-                    new THREE.OBJLoader()
-                        .setMaterials(materials)
-                        .setPath('./')
-                        .load('puppy.obj', function (group) {
-                            mesh0 = group.children[0];
-                            mesh0.material.side = THREE.DoubleSide;
-                            mesh0.position.y = 0.025;
-                            mesh0.scale.set(1.25, 1.25, 1.25);
-                            mesh0.rotation.y = Math.PI / 2;
-                            markerRoot1.add(mesh0);
-                        });
-                });
+            // 诊断用的方块，代替小狗
+            let geometry1 = new THREE.BoxGeometry(1, 1, 1);
+            let material1 = new THREE.MeshNormalMaterial();
+            let mesh1 = new THREE.Mesh(geometry1, material1);
+            mesh1.position.y = 0.5;
+            markerRoot1.add(mesh1);
         }
 
         function animate() {
             requestAnimationFrame(animate);
             deltaTime = clock.getDelta();
-            totalTime += deltaTime;
             if (arToolkitSource.ready !== false) {
                 arToolkitContext.update(arToolkitSource.domElement);
             }
