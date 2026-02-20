@@ -2,13 +2,23 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR Puppy Test</title>
+    <title>AR Puppy Debug</title>
+    <script>
+        window.onerror = function(msg, url, line) {
+            alert("抓到虫了！报错信息: " + msg + "\n在第 " + line + " 行");
+        };
+    </script>
     <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/MTLLoader.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar.js"></script>
 </head>
-<body style="margin: 0px; overflow: hidden;">
+<body style="margin: 0px; overflow: hidden; background-color: #333333;">
+    <div id="info" style="color: white; font-size: 18px; text-align: center; margin-top: 50px; padding: 20px;">
+        正在请求摄像头权限，请稍候...<br><br>
+        (如果一直卡在这里，请检查网址是否为 https，或者查看是否有报错弹窗)
+    </div>
+
     <script>
         var scene, camera, renderer, clock, deltaTime, totalTime;
         var arToolkitSource, arToolkitContext, markerRoot1, mesh0;
@@ -17,16 +27,13 @@
         animate();
 
         function initialize() {
-            // 1. 设置场景和光照 (不然小狗是黑的) 
             scene = new THREE.Scene();
-            let ambientLight = new THREE.AmbientLight(0xcccccc, 1.0);
+            let ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
             scene.add(ambientLight);
 
-            // 2. 设置虚拟摄像头 
             camera = new THREE.Camera();
             scene.add(camera);
 
-            // 3. 设置渲染器并让背景透明，以便显示真实摄像头画面 
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setClearColor(new THREE.Color('lightgrey'), 0);
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -35,14 +42,16 @@
             renderer.domElement.style.left = '0px';
             document.body.appendChild(renderer.domElement);
 
-            // 4. 时钟
             clock = new THREE.Clock();
             deltaTime = 0;
             totalTime = 0;
 
-            // 5. 开启摄像头源 
             arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
-            arToolkitSource.init(function onReady(){ onResize(); });
+            arToolkitSource.init(function onReady(){ 
+                // 摄像头开启成功后，隐藏文字提示
+                document.getElementById('info').style.display = 'none';
+                onResize(); 
+            });
             window.addEventListener('resize', function(){ onResize(); });
             function onResize() {
                 arToolkitSource.onResizeElement();
@@ -52,7 +61,6 @@
                 }
             }
 
-            // 6. AR 上下文和投影矩阵 
             arToolkitContext = new THREEx.ArToolkitContext({
                 cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
                 detectionMode: 'mono'
@@ -61,7 +69,6 @@
                 camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
             });
 
-            // 7. 绑定 Hiro 标记 
             markerRoot1 = new THREE.Group();
             scene.add(markerRoot1);
             new THREEx.ArMarkerControls(arToolkitContext, markerRoot1, {
@@ -69,7 +76,6 @@
                 patternUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.hiro',
             });
 
-            // 8. 加载你上传的 Puppy 模型！ 
             new THREE.MTLLoader()
                 .setPath('./')
                 .load('puppy.mtl', function (materials) {
@@ -80,7 +86,6 @@
                         .load('puppy.obj', function (group) {
                             mesh0 = group.children[0];
                             mesh0.material.side = THREE.DoubleSide;
-                            // 调整小狗的位置、大小和旋转角度 
                             mesh0.position.y = 0.025;
                             mesh0.scale.set(1.25, 1.25, 1.25);
                             mesh0.rotation.y = Math.PI / 2;
@@ -93,17 +98,9 @@
             requestAnimationFrame(animate);
             deltaTime = clock.getDelta();
             totalTime += deltaTime;
-            update();
-            render();
-        }
-
-        function update() {
             if (arToolkitSource.ready !== false) {
                 arToolkitContext.update(arToolkitSource.domElement);
             }
-        }
-
-        function render() {
             renderer.render(scene, camera);
         }
     </script>
