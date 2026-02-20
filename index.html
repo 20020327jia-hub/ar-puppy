@@ -19,12 +19,16 @@
       </a-assets>
 
       <a-marker preset="hiro">
+        
+        <a-plane position="0 0 0" rotation="-90 0 0" width="2" height="2" color="#4CAF50"></a-plane>
+
         <a-entity 
           obj-model="obj: #puppy-obj; mtl: #puppy-mtl"
           scale="1.25 1.25 1.25"
-          position="0 0 0"
-          rotation="0 90 0">
+          position="0 0.1 0"
+          rotation="-90 0 0">
         </a-entity>
+        
       </a-marker>
       
       <a-entity camera></a-entity>
