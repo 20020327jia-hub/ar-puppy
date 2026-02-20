@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR Puppy Debug</title>
+    <title>AR Puppy Final</title>
     <script>
         window.onerror = function(msg, url, line) {
             alert("抓到虫了！报错信息: " + msg + "\n在第 " + line + " 行");
@@ -11,12 +11,12 @@
     <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/MTLLoader.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar.js"></script>
+    <script src="https://unpkg.com/@ar-js-org/ar.js@3.3.2/three.js/build/ar.js"></script>
 </head>
 <body style="margin: 0px; overflow: hidden; background-color: #333333;">
     <div id="info" style="color: white; font-size: 18px; text-align: center; margin-top: 50px; padding: 20px;">
-        正在请求摄像头权限，请稍候...<br><br>
-        (如果一直卡在这里，请检查网址是否为 https，或者查看是否有报错弹窗)
+        正在请求摄像头权限，加载模型中...<br><br>
+        (由于 3D 模型较大，可能需要等待十几秒)
     </div>
 
     <script>
@@ -48,7 +48,6 @@
 
             arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
             arToolkitSource.init(function onReady(){ 
-                // 摄像头开启成功后，隐藏文字提示
                 document.getElementById('info').style.display = 'none';
                 onResize(); 
             });
@@ -62,7 +61,8 @@
             }
 
             arToolkitContext = new THREEx.ArToolkitContext({
-                cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
+                // 这里也换成稳定的链接
+                cameraParametersUrl: 'https://unpkg.com/@ar-js-org/ar.js@3.3.2/data/data/camera_para.dat',
                 detectionMode: 'mono'
             });
             arToolkitContext.init(function onCompleted(){
@@ -73,7 +73,8 @@
             scene.add(markerRoot1);
             new THREEx.ArMarkerControls(arToolkitContext, markerRoot1, {
                 type: 'pattern',
-                patternUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.hiro',
+                // 这里也换成稳定的链接
+                patternUrl: 'https://unpkg.com/@ar-js-org/ar.js@3.3.2/data/data/patt.hiro',
             });
 
             new THREE.MTLLoader()
