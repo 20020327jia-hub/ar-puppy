@@ -2,31 +2,41 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR Puppy Rescue</title>
+    <title>AR Puppy Click To Start</title>
     <script>
+        // 抓虫神器升级版：逼手机交出真实报错！
         window.onerror = function(msg, url, line) {
-            if(msg.indexOf('THREEx') !== -1) return; // 忽略重复报错
-            alert("抓到虫了！报错: " + msg + "\n行数: " + line);
+            alert("真实报错: " + msg + "\n行数: " + line);
         };
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" onerror="alert('警告：Three.js 核心库被你的网络拦截了！')"></script>
-    <script src="https://fastly.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/MTLLoader.js" onerror="alert('警告：MTL 加载器被你的网络拦截了！')"></script>
-    <script src="https://fastly.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js" onerror="alert('警告：OBJ 加载器被你的网络拦截了！')"></script>
-    <script src="https://fastly.jsdelivr.net/gh/AR-js-org/AR.js@3.3.2/three.js/build/ar.js" onerror="alert('致命拦截：AR.js 库没下载下来，所以找不到 THREEx！请尝试切换手机网络（比如用流量）')"></script>
+    <script crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script crossorigin="anonymous" src="https://fastly.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/MTLLoader.js"></script>
+    <script crossorigin="anonymous" src="https://fastly.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <script crossorigin="anonymous" src="https://fastly.jsdelivr.net/gh/AR-js-org/AR.js@3.3.2/three.js/build/ar.js"></script>
 </head>
 <body style="margin: 0px; overflow: hidden; background-color: #333333;">
-    <div id="info" style="color: white; font-size: 18px; text-align: center; margin-top: 50px; padding: 20px;">
-        正在请求摄像头，加载小狗模型中...<br><br>
-        (如果有弹窗说“被网络拦截”，说明你的网屏蔽了开发库)
+    
+    <div id="start-screen" style="position:absolute; top:0; left:0; width:100%; height:100%; background:#222; z-index:9999; display:flex; justify-content:center; align-items:center; flex-direction:column;">
+        <p style="color:white; font-size:18px; text-align:center; padding:20px;">
+            请确认已将 tex.jpg 传至 GitHub！<br><br>
+            为突破苹果的安全拦截，请手动点击下方按钮
+        </p>
+        <button onclick="startAR()" style="padding: 15px 30px; font-size: 20px; background-color: #4CAF50; color: white; border: none; border-radius: 8px;">允许开启摄像头并加载小狗</button>
     </div>
 
     <script>
-        // 确保核心库存在再执行，避免无意义的卡死
-        if (typeof THREEx === 'undefined') {
-            document.getElementById('info').innerHTML = "⚠️ 失败：AR核心库被你的网络（Wi-Fi或运营商）屏蔽了，请切换网络后刷新重试。";
-        } else {
-            var scene, camera, renderer, clock, deltaTime, totalTime;
-            var arToolkitSource, arToolkitContext, markerRoot1, mesh0;
+        var scene, camera, renderer, clock, deltaTime, totalTime;
+        var arToolkitSource, arToolkitContext, markerRoot1, mesh0;
+
+        function startAR() {
+            // 隐藏启动按钮
+            document.getElementById('start-screen').style.display = 'none';
+
+            if (typeof THREEx === 'undefined') {
+                alert("⚠️ 核心库还是没下载下来！请关掉手机 Wi-Fi，用 5G/4G 流量刷新网页！");
+                return;
+            }
+
             initialize();
             animate();
         }
@@ -53,7 +63,6 @@
 
             arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
             arToolkitSource.init(function onReady(){ 
-                document.getElementById('info').style.display = 'none';
                 onResize(); 
             });
             window.addEventListener('resize', function(){ onResize(); });
